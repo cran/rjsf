@@ -1,0 +1,49 @@
+Package: rjsf
+Title: R Interface to Jump-Switch-Flow Simulation
+Version: 0.1.0
+Authors@R: 
+    c(
+      person(
+        given = "Thanh Long",
+        family = "Vu",
+        email = "longvu2000.work@gmail.com",
+        role = c("aut", "cre", "cph")
+      ),
+      person(
+        given = "Domenic",
+        family = "Germano",
+        role = "aut"
+      ),
+      person(
+        given = "Michael",
+        family = "Lydeamore",
+        role = "aut"
+      )
+    )
+Description: An R interface to Jump-Switch-Flow (JSF), a hybrid
+    simulation framework for compartmental reaction models that combines
+    stochastic jump dynamics at low population sizes with deterministic flow
+    dynamics at high population sizes. Simulations are performed using the
+    'jsf' backend for 'Python' through 'reticulate', with structured R outputs
+    for inspection, summary, and plotting. The underlying methodology is
+    described in Germano et al. (2026)
+    <doi:10.1007/s00285-026-02409-y>.
+License: MIT + file LICENSE
+URL: https://olivervu25.github.io/rjsf/,
+        https://github.com/olivervu25/rjsf
+BugReports: https://github.com/olivervu25/rjsf/issues
+SystemRequirements: Python, Quarto command line tool
+Encoding: UTF-8
+RoxygenNote: 7.3.2
+Imports: reticulate, S7
+Suggests: quarto, testthat (>= 3.0.0)
+VignetteBuilder: quarto
+Config/testthat/edition: 3
+NeedsCompilation: no
+Packaged: 2026-10-03 16:20:23 UTC; olivervu25
+Author: Thanh Long Vu [aut, cre, cph],
+  Domenic Germano [aut],
+  Michael Lydeamore [aut]
+Maintainer: Thanh Long Vu <longvu2000.work@gmail.com>
+Repository: CRAN
+Date/Publication: 2026-10-15 16:10:08 UTC

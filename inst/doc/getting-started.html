@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Set up Python JSF, define compartmental models, and run Jump-Switch-Flow simulations from R.">
+
+<title>Getting started with rjsf</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+width: 0.8em;
+margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+
+
+<style type="text/css">.top-right{position:absolute;top:1em;right:1em}.hidden{display:none !important}.zindex-bottom{z-index:-1 !important}.quarto-layout-panel{margin-bottom:1em}.quarto-layout-panel>figure{width:100%}.quarto-layout-panel>figure>figcaption,.quarto-layout-panel>.panel-caption{margin-top:10pt}.quarto-layout-panel>.table-caption{margin-top:0px}.table-caption p{margin-bottom:.5em}.quarto-layout-row{display:flex;flex-direction:row;align-items:flex-start}.quarto-layout-valign-top{align-items:flex-start}.quarto-layout-valign-bottom{align-items:flex-end}.quarto-layout-valign-center{align-items:center}.quarto-layout-cell{position:relative;margin-right:20px}.quarto-layout-cell:last-child{margin-right:0}.quarto-layout-cell figure,.quarto-layout-cell>p{margin:.2em}.quarto-layout-cell img{max-width:100%}.quarto-layout-cell .html-widget{width:100% !important}.quarto-layout-cell div figure p{margin:0}.quarto-layout-cell figure{display:inline-block;margin-inline-start:0;margin-inline-end:0}.quarto-layout-cell table{display:inline-table}.quarto-layout-cell-subref figcaption,figure .quarto-layout-row figure figcaption{text-align:center;font-style:italic}.quarto-figure{position:relative;margin-bottom:1em}.quarto-figure>figure{width:100%;margin-bottom:0}.quarto-figure-left>figure>p,.quarto-figure-left>figure>div{text-align:left}.quarto-figure-center>figure>p,.quarto-figure-center>figure>div{text-align:center}.quarto-figure-right>figure>p,.quarto-figure-right>figure>div{text-align:right}figure>p:empty{display:none}figure>p:first-child{margin-top:0;margin-bottom:0}figure>figcaption{margin-top:.5em}div[id^=tbl-]{position:relative}.quarto-figure>.anchorjs-link{position:absolute;top:.6em;right:.5em}div[id^=tbl-]>.anchorjs-link{position:absolute;top:.7em;right:.3em}.quarto-figure:hover>.anchorjs-link,div[id^=tbl-]:hover>.anchorjs-link,h2:hover>.anchorjs-link,h3:hover>.anchorjs-link,h4:hover>.anchorjs-link,h5:hover>.anchorjs-link,h6:hover>.anchorjs-link,.reveal-anchorjs-link>.anchorjs-link{opacity:1}#title-block-header{margin-block-end:1rem;position:relative;margin-top:-1px}#title-block-header .abstract{margin-block-start:1rem}#title-block-header .abstract .abstract-title{font-weight:600}#title-block-header a{text-decoration:none}#title-block-header .author,#title-block-header .date,#title-block-header .doi{margin-block-end:.2rem}#title-block-header .quarto-title-block>div{display:flex}#title-block-header .quarto-title-block>div>h1{flex-grow:1}#title-block-header .quarto-title-block>div>button{flex-shrink:0;height:2.25rem;margin-top:0}tr.header>th>p:last-of-type{margin-bottom:0px}table,.table{caption-side:top;margin-bottom:1.5rem}caption,.table-caption{padding-top:.5rem;padding-bottom:.5rem;text-align:center}.utterances{max-width:none;margin-left:-8px}iframe{margin-bottom:1em}details{margin-bottom:1em}details[show]{margin-bottom:0}details>summary{color:#6f6f6f}details>summary>p:only-child{display:inline}pre.sourceCode,code.sourceCode{position:relative}p code:not(.sourceCode){white-space:pre-wrap}code{white-space:pre}@media print{code{white-space:pre-wrap}}pre>code{display:block}pre>code.sourceCode{white-space:pre}pre>code.sourceCode>span>a:first-child::before{text-decoration:none}pre.code-overflow-wrap>code.sourceCode{white-space:pre-wrap}pre.code-overflow-scroll>code.sourceCode{white-space:pre}code a:any-link{color:inherit;text-decoration:none}code a:hover{color:inherit;text-decoration:underline}ul.task-list{padding-left:1em}[data-tippy-root]{display:inline-block}.tippy-content .footnote-back{display:none}.quarto-embedded-source-code{display:none}.quarto-unresolved-ref{font-weight:600}.quarto-cover-image{max-width:35%;float:right;margin-left:30px}.cell-output-display .widget-subarea{margin-bottom:1em}.cell-output-display:not(.no-overflow-x),.knitsql-table:not(.no-overflow-x){overflow-x:auto}.panel-input{margin-bottom:1em}.panel-input>div,.panel-input>div>div{display:inline-block;vertical-align:top;padding-right:12px}.panel-input>p:last-child{margin-bottom:0}.layout-sidebar{margin-bottom:1em}.layout-sidebar .tab-content{border:none}.tab-content>.page-columns.active{display:grid}div.sourceCode>iframe{width:100%;height:300px;margin-bottom:-0.5em}div.ansi-escaped-output{font-family:monospace;display:block}.ansi-black-fg{color:#3e424d}.ansi-black-bg{background-color:#3e424d}.ansi-black-intense-fg{color:#282c36}.ansi-black-intense-bg{background-color:#282c36}.ansi-red-fg{color:#e75c58}.ansi-red-bg{background-color:#e75c58}.ansi-red-intense-fg{color:#b22b31}.ansi-red-intense-bg{background-color:#b22b31}.ansi-green-fg{color:#00a250}.ansi-green-bg{background-color:#00a250}.ansi-green-intense-fg{color:#007427}.ansi-green-intense-bg{background-color:#007427}.ansi-yellow-fg{color:#ddb62b}.ansi-yellow-bg{background-color:#ddb62b}.ansi-yellow-intense-fg{color:#b27d12}.ansi-yellow-intense-bg{background-color:#b27d12}.ansi-blue-fg{color:#208ffb}.ansi-blue-bg{background-color:#208ffb}.ansi-blue-intense-fg{color:#0065ca}.ansi-blue-intense-bg{background-color:#0065ca}.ansi-magenta-fg{color:#d160c4}.ansi-magenta-bg{background-color:#d160c4}.ansi-magenta-intense-fg{color:#a03196}.ansi-magenta-intense-bg{background-color:#a03196}.ansi-cyan-fg{color:#60c6c8}.ansi-cyan-bg{background-color:#60c6c8}.ansi-cyan-intense-fg{color:#258f8f}.ansi-cyan-intense-bg{background-color:#258f8f}.ansi-white-fg{color:#c5c1b4}.ansi-white-bg{background-color:#c5c1b4}.ansi-white-intense-fg{color:#a1a6b2}.ansi-white-intense-bg{background-color:#a1a6b2}.ansi-default-inverse-fg{color:#fff}.ansi-default-inverse-bg{background-color:#000}.ansi-bold{font-weight:bold}.ansi-underline{text-decoration:underline}:root{--quarto-body-bg: #fff;--quarto-body-color: #222;--quarto-text-muted: #6f6f6f;--quarto-border-color: #6f6f6f;--quarto-border-width: 1px;--quarto-border-radius: 4px}table.gt_table{color:var(--quarto-body-color);font-size:1em;width:100%;background-color:rgba(0,0,0,0);border-top-width:inherit;border-bottom-width:inherit;border-color:var(--quarto-border-color)}table.gt_table th.gt_column_spanner_outer{color:var(--quarto-body-color);background-color:rgba(0,0,0,0);border-top-width:inherit;border-bottom-width:inherit;border-color:var(--quarto-border-color)}table.gt_table th.gt_col_heading{color:var(--quarto-body-color);font-weight:bold;background-color:rgba(0,0,0,0)}table.gt_table thead.gt_col_headings{border-bottom:1px solid currentColor;border-top-width:inherit;border-top-color:var(--quarto-border-color)}table.gt_table thead.gt_col_headings:not(:first-child){border-top-width:1px;border-top-color:var(--quarto-border-color)}table.gt_table td.gt_row{border-bottom-width:1px;border-bottom-color:var(--quarto-border-color);border-top-width:0px}table.gt_table tbody.gt_table_body{border-top-width:1px;border-bottom-width:1px;border-bottom-color:var(--quarto-border-color);border-top-color:currentColor}div.columns{display:initial;gap:initial}div.column{display:inline-block;overflow-x:initial;vertical-align:top;width:50%}.code-annotation-tip-content{word-wrap:break-word}.code-annotation-container-hidden{display:none !important}dl.code-annotation-container-grid{display:grid;grid-template-columns:min-content auto}dl.code-annotation-container-grid dt{grid-column:1}dl.code-annotation-container-grid dd{grid-column:2}pre.sourceCode.code-annotation-code{padding-right:0}code.sourceCode .code-annotation-anchor{z-index:100;position:absolute;right:.5em;left:inherit;background-color:rgba(0,0,0,0)}:root{--mermaid-bg-color: #fff;--mermaid-edge-color: #999;--mermaid-node-fg-color: #222;--mermaid-fg-color: #222;--mermaid-fg-color--lighter: #3c3c3c;--mermaid-fg-color--lightest: #555555;--mermaid-font-family: sans-serif;--mermaid-label-bg-color: #fff;--mermaid-label-fg-color: #468;--mermaid-node-bg-color: rgba(68, 102, 136, 0.1);--mermaid-node-fg-color: #222}@media print{:root{font-size:11pt}#quarto-sidebar,#TOC,.nav-page{display:none}.page-columns .content{grid-column-start:page-start}.fixed-top{position:relative}.panel-caption,.figure-caption,figcaption{color:#666}}
+</style>
+<link href="data:text/css,%0A%3Aroot%20%7B%0A%2D%2Dquarto%2Dhl%2Dot%2Dcolor%3A%20%23003B4F%3B%0A%2D%2Dquarto%2Dhl%2Dat%2Dcolor%3A%20%23657422%3B%0A%2D%2Dquarto%2Dhl%2Dss%2Dcolor%3A%20%2320794D%3B%0A%2D%2Dquarto%2Dhl%2Dan%2Dcolor%3A%20%235E5E5E%3B%0A%2D%2Dquarto%2Dhl%2Dfu%2Dcolor%3A%20%234758AB%3B%0A%2D%2Dquarto%2Dhl%2Dst%2Dcolor%3A%20%2320794D%3B%0A%2D%2Dquarto%2Dhl%2Dcf%2Dcolor%3A%20%23003B4F%3B%0A%2D%2Dquarto%2Dhl%2Dop%2Dcolor%3A%20%235E5E5E%3B%0A%2D%2Dquarto%2Dhl%2Der%2Dcolor%3A%20%23AD0000%3B%0A%2D%2Dquarto%2Dhl%2Dbn%2Dcolor%3A%20%23AD0000%3B%0A%2D%2Dquarto%2Dhl%2Dal%2Dcolor%3A%20%23AD0000%3B%0A%2D%2Dquarto%2Dhl%2Dva%2Dcolor%3A%20%23111111%3B%0A%2D%2Dquarto%2Dhl%2Dbu%2Dcolor%3A%20inherit%3B%0A%2D%2Dquarto%2Dhl%2Dex%2Dcolor%3A%20inherit%3B%0A%2D%2Dquarto%2Dhl%2Dpp%2Dcolor%3A%20%23AD0000%3B%0A%2D%2Dquarto%2Dhl%2Din%2Dcolor%3A%20%235E5E5E%3B%0A%2D%2Dquarto%2Dhl%2Dvs%2Dcolor%3A%20%2320794D%3B%0A%2D%2Dquarto%2Dhl%2Dwa%2Dcolor%3A%20%235E5E5E%3B%0A%2D%2Dquarto%2Dhl%2Ddo%2Dcolor%3A%20%235E5E5E%3B%0A%2D%2Dquarto%2Dhl%2Dim%2Dcolor%3A%20%2300769E%3B%0A%2D%2Dquarto%2Dhl%2Dch%2Dcolor%3A%20%2320794D%3B%0A%2D%2Dquarto%2Dhl%2Ddt%2Dcolor%3A%20%23AD0000%3B%0A%2D%2Dquarto%2Dhl%2Dfl%2Dcolor%3A%20%23AD0000%3B%0A%2D%2Dquarto%2Dhl%2Dco%2Dcolor%3A%20%235E5E5E%3B%0A%2D%2Dquarto%2Dhl%2Dcv%2Dcolor%3A%20%235E5E5E%3B%0A%2D%2Dquarto%2Dhl%2Dcn%2Dcolor%3A%20%238f5902%3B%0A%2D%2Dquarto%2Dhl%2Dsc%2Dcolor%3A%20%235E5E5E%3B%0A%2D%2Dquarto%2Dhl%2Ddv%2Dcolor%3A%20%23AD0000%3B%0A%2D%2Dquarto%2Dhl%2Dkw%2Dcolor%3A%20%23003B4F%3B%0A%7D%0A%0A%3Aroot%20%7B%0A%2D%2Dquarto%2Dfont%2Dmonospace%3A%20SFMono%2DRegular%2C%20Menlo%2C%20Monaco%2C%20Consolas%2C%20%22Liberation%20Mono%22%2C%20%22Courier%20New%22%2C%20monospace%3B%0A%7D%0Apre%20%3E%20code%2EsourceCode%20%3E%20span%20%7B%0Acolor%3A%20%23003B4F%3B%0A%7D%0Acode%20span%20%7B%0Acolor%3A%20%23003B4F%3B%0A%7D%0Acode%2EsourceCode%20%3E%20span%20%7B%0Acolor%3A%20%23003B4F%3B%0A%7D%0Adiv%2EsourceCode%2C%0Adiv%2EsourceCode%20pre%2EsourceCode%20%7B%0Acolor%3A%20%23003B4F%3B%0A%7D%0Acode%20span%2Eot%20%7B%0Acolor%3A%20%23003B4F%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Eat%20%7B%0Acolor%3A%20%23657422%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Ess%20%7B%0Acolor%3A%20%2320794D%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Ean%20%7B%0Acolor%3A%20%235E5E5E%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Efu%20%7B%0Acolor%3A%20%234758AB%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Est%20%7B%0Acolor%3A%20%2320794D%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Ecf%20%7B%0Acolor%3A%20%23003B4F%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Eop%20%7B%0Acolor%3A%20%235E5E5E%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Eer%20%7B%0Acolor%3A%20%23AD0000%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Ebn%20%7B%0Acolor%3A%20%23AD0000%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Eal%20%7B%0Acolor%3A%20%23AD0000%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Eva%20%7B%0Acolor%3A%20%23111111%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Ebu%20%7B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Eex%20%7B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Epp%20%7B%0Acolor%3A%20%23AD0000%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Ein%20%7B%0Acolor%3A%20%235E5E5E%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Evs%20%7B%0Acolor%3A%20%2320794D%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Ewa%20%7B%0Acolor%3A%20%235E5E5E%3B%0Afont%2Dstyle%3A%20italic%3B%0A%7D%0Acode%20span%2Edo%20%7B%0Acolor%3A%20%235E5E5E%3B%0Afont%2Dstyle%3A%20italic%3B%0A%7D%0Acode%20span%2Eim%20%7B%0Acolor%3A%20%2300769E%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Ech%20%7B%0Acolor%3A%20%2320794D%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Edt%20%7B%0Acolor%3A%20%23AD0000%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Efl%20%7B%0Acolor%3A%20%23AD0000%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Eco%20%7B%0Acolor%3A%20%235E5E5E%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Ecv%20%7B%0Acolor%3A%20%235E5E5E%3B%0Afont%2Dstyle%3A%20italic%3B%0A%7D%0Acode%20span%2Ecn%20%7B%0Acolor%3A%20%238f5902%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Esc%20%7B%0Acolor%3A%20%235E5E5E%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Edv%20%7B%0Acolor%3A%20%23AD0000%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0Acode%20span%2Ekw%20%7B%0Acolor%3A%20%23003B4F%3B%0Afont%2Dstyle%3A%20inherit%3B%0A%7D%0A%2Eprevent%2Dinlining%20%7B%0Acontent%3A%20%22%3C%2F%22%3B%0A%7D%0A%0A" rel="stylesheet" id="quarto-text-highlighting-styles">
+
+
+<style type="text/css">body {background-color: #fff;margin: 1em auto;max-width: 700px;overflow: visible;padding-left: 2em;padding-right: 2em;font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;font-size: 14px;line-height: 1.35;}table {margin: 1em auto;border-width: 1px;border-color: #DDDDDD;border-style: outset;border-collapse: collapse;}table th {border-width: 2px;padding: 5px;border-style: inset;}table td {border-width: 1px;border-style: inset;line-height: 18px;padding: 5px 5px;}table, table th, table td {border-left-style: none;border-right-style: none;}table thead, table tr.even {background-color: #f7f7f7;}p {margin: 0.5em 0;}blockquote {background-color: #f6f6f6;padding: 0.25em 0.75em;}hr {border-style: solid;border: none;border-top: 1px solid #777;margin: 28px 0;}dl {margin-left: 0;}dl dd {margin-bottom: 13px;margin-left: 13px;}dl dt {font-weight: bold;}ul {margin-top: 0;}ul li {list-style: circle outside;}ul ul {margin-bottom: 0;}pre, code {background-color: #f7f7f7;border-radius: 3px;color: #333;white-space: pre-wrap; }pre {border-radius: 3px;margin: 5px 0px 10px 0px;padding: 10px;}pre:not([class]) {background-color: #f7f7f7;}code {font-family: Consolas, Monaco, 'Courier New', monospace;font-size: 85%;}p > code, li > code {padding: 2px 0px;}div.figure {text-align: center;}img {background-color: #FFFFFF;padding: 2px;border: 1px solid #DDDDDD;border-radius: 3px;border: 1px solid #CCCCCC;margin: 0 5px;}h1 {margin-top: 0;font-size: 35px;line-height: 40px;}h2 {border-bottom: 4px solid #f7f7f7;padding-top: 10px;padding-bottom: 2px;font-size: 145%;}h3 {border-bottom: 2px solid #f7f7f7;padding-top: 10px;font-size: 120%;}h4 {border-bottom: 1px solid #f7f7f7;margin-left: 8px;font-size: 105%;}h5, h6 {border-bottom: 1px solid #ccc;font-size: 105%;}a {color: #0033dd;text-decoration: none;}a:hover {color: #6666ff; }a:visited {color: #800080; }a:visited:hover {color: #BB00BB; }a[href^="http:"] {text-decoration: underline; }a[href^="https:"] {text-decoration: underline; }</style>
+</head>
+
+<body>
+
+
+<header id="title-block-header">
+<h1 class="title">Getting started with rjsf</h1>
+
+</header>
+<nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction">Introduction</a></li>
+  <li><a href="#set-up-python-jsf" id="toc-set-up-python-jsf">Set up Python <code>jsf</code></a></li>
+  <li><a href="#check-python-jsf" id="toc-check-python-jsf">Check Python <code>jsf</code></a></li>
+  <li><a href="#lotka-volterra-predator-prey-model" id="toc-lotka-volterra-predator-prey-model">Lotka-Volterra predator-prey model</a>
+  <ul>
+  <li><a href="#define-the-rate-function" id="toc-define-the-rate-function">Define the rate function</a></li>
+  <li><a href="#define-the-stoichiometry" id="toc-define-the-stoichiometry">Define the stoichiometry</a></li>
+  <li><a href="#run-the-simulation" id="toc-run-the-simulation">Run the simulation</a></li>
+  <li><a href="#inspect-the-result" id="toc-inspect-the-result">Inspect the result</a></li>
+  </ul></li>
+  <li><a href="#sir-epidemic-model" id="toc-sir-epidemic-model">SIR epidemic model</a>
+  <ul>
+  <li><a href="#define-the-model-parameters" id="toc-define-the-model-parameters">Define the model parameters</a></li>
+  <li><a href="#define-the-rate-function-1" id="toc-define-the-rate-function-1">Define the rate function</a></li>
+  <li><a href="#define-the-stoichiometry-1" id="toc-define-the-stoichiometry-1">Define the stoichiometry</a></li>
+  <li><a href="#run-the-simulation-1" id="toc-run-the-simulation-1">Run the simulation</a></li>
+  <li><a href="#inspect-the-result-1" id="toc-inspect-the-result-1">Inspect the result</a></li>
+  </ul></li>
+  <li><a href="#return-a-data-frame" id="toc-return-a-data-frame">Return a data frame</a></li>
+  <li><a href="#summary" id="toc-summary">Summary</a></li>
+  </ul>
+</nav>
+<h2 id="introduction">Introduction</h2>
+<p><code>rjsf</code> provides an R interface to Jump-Switch-Flow (JSF), a hybrid simulation framework for compartmental models that combines stochastic jump dynamics at low populations with deterministic flow dynamics at high populations.</p>
+<p>Running simulations requires the Python <code>jsf</code> backend, which <code>rjsf</code> accesses through <code>reticulate</code>.</p>
+<p>The main user-facing function is <code>jsf_simulate()</code>. It lets users:</p>
+<ol type="1">
+<li><p>Define a compartmental reaction model in R.</p></li>
+<li><p>Pass the model to the Python <code>jsf</code> backend through <code>reticulate</code>.</p></li>
+<li><p>Return the simulation output as either:</p>
+<ul>
+<li>a regular R <code>data.frame</code>; or</li>
+<li>a structured <code>JSFResult</code> object.</li>
+</ul></li>
+</ol>
+<p>A <code>JSFResult</code> object supports standard methods such as:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(result)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(result)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(result)</span></code></pre></div>
+</div>
+<h2 id="set-up-python-jsf">Set up Python <code>jsf</code></h2>
+<p><code>rjsf</code> uses <code>reticulate</code> to communicate with Python. The Python <code>jsf</code> package must therefore already be installed in the Python environment used by <code>reticulate</code>.</p>
+<p>Installation instructions for the Python dependencies are provided in the package README.</p>
+<p>You can inspect the Python environment selected by <code>reticulate</code> with:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>reticulate<span class="sc">::</span><span class="fu">py_config</span>()</span></code></pre></div>
+</div>
+<h2 id="check-python-jsf">Check Python <code>jsf</code></h2>
+<p>Load <code>rjsf</code> and check whether the Python <code>jsf</code> module is available:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rjsf)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">jsf_available</span>()</span></code></pre></div>
+</div>
+<p>A correctly configured environment should return:</p>
+<pre class="text"><code>[1] TRUE</code></pre>
+<p>If it returns <code>FALSE</code>, check that:</p>
+<ul>
+<li>Python <code>jsf</code> is installed;</li>
+<li>it is installed in the environment currently used by <code>reticulate</code>; and</li>
+<li><code>reticulate::py_config()</code> reports the expected Python executable.</li>
+</ul>
+<h2 id="lotka-volterra-predator-prey-model">Lotka-Volterra predator-prey model</h2>
+<p>The Lotka-Volterra model describes interactions between two species:</p>
+<ul>
+<li><code>prey</code>;</li>
+<li><code>predator</code>.</li>
+</ul>
+<p>The model contains three reactions:</p>
+<ol type="1">
+<li>Prey birth: <code>Prey -&gt; 2 Prey</code></li>
+<li>Predator death: <code>Predator -&gt; NULL</code></li>
+<li>Predation: <code>Prey + Predator -&gt; 2 Predator</code></li>
+</ol>
+<p>The state vector is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(prey, predator)</span></code></pre></div>
+</div>
+<h3 id="define-the-rate-function">Define the rate function</h3>
+<p>The Python <code>jsf</code> backend expects the rate function to be a Python callable. We create one using <code>reticulate::py_eval()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>rates_lv <span class="ot">&lt;-</span> reticulate<span class="sc">::</span><span class="fu">py_eval</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;lambda x, t: [2.0 * x[0], 1.5 * x[1], 0.05 * x[0] * x[1]]&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<p>The three rates correspond to:</p>
+<pre class="text"><code>2.0 * prey                # prey birth
+1.5 * predator            # predator death
+0.05 * prey * predator    # predation</code></pre>
+<h3 id="define-the-stoichiometry">Define the stoichiometry</h3>
+<p>The reactant matrix describes what each reaction consumes:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>reactant_lv <span class="ot">&lt;-</span> <span class="fu">matrix</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>, <span class="dv">0</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>, <span class="dv">1</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>, <span class="dv">1</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ncol =</span> <span class="dv">2</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">byrow =</span> <span class="cn">TRUE</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>reactant_lv</span></code></pre></div>
+</div>
+<p>The product matrix describes what each reaction produces:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>product_lv <span class="ot">&lt;-</span> <span class="fu">matrix</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2</span>, <span class="dv">0</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>, <span class="dv">0</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>, <span class="dv">2</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">ncol =</span> <span class="dv">2</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">byrow =</span> <span class="cn">TRUE</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>product_lv</span></code></pre></div>
+</div>
+<p>Internally, <code>jsf_simulate()</code> calculates the net stoichiometry matrix as:</p>
+<pre class="text"><code>nu = product - reactant</code></pre>
+<p>For this model, the net state changes are:</p>
+<pre class="text"><code>Prey -&gt; 2 Prey                 [+1,  0]
+Predator -&gt; NULL                  [ 0, -1]
+Prey + Predator -&gt; 2 Predator  [-1, +1]</code></pre>
+<h3 id="run-the-simulation">Run the simulation</h3>
+<p>Run the model and request a <code>JSFResult</code> object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>result_lv <span class="ot">&lt;-</span> <span class="fu">jsf_simulate</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x0 =</span> <span class="fu">c</span>(<span class="at">prey =</span> <span class="dv">50</span>, <span class="at">predator =</span> <span class="dv">10</span>),</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">rates =</span> rates_lv,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">reactant =</span> reactant_lv,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">product =</span> product_lv,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">do_disc =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_max =</span> <span class="dv">10</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">dt =</span> <span class="fl">0.01</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">switching_threshold =</span> <span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">30</span>),</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_names =</span> <span class="fu">c</span>(<span class="st">&quot;prey&quot;</span>, <span class="st">&quot;predator&quot;</span>),</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">return_type =</span> <span class="st">&quot;JSFResult&quot;</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<p>The important arguments are:</p>
+<ul>
+<li><code>x0</code> defines the initial number of prey and predators.</li>
+<li><code>do_disc = c(1, 1)</code> allows both species to be treated discretely when required.</li>
+<li><code>switching_threshold = c(30, 30)</code> defines the switching threshold for each species.</li>
+<li><code>return_type = &quot;JSFResult&quot;</code> returns a structured result containing the simulation trajectory and associated metadata.</li>
+</ul>
+<h3 id="inspect-the-result">Inspect the result</h3>
+<p>Print the result:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>result_lv</span></code></pre></div>
+</div>
+<p>Calculate a summary:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(result_lv)</span></code></pre></div>
+</div>
+<p>Plot the simulated trajectories:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(result_lv)</span></code></pre></div>
+</div>
+<h2 id="sir-epidemic-model">SIR epidemic model</h2>
+<p>The SIR model describes the spread of an infectious disease through three compartments:</p>
+<ul>
+<li><code>S</code>: susceptible;</li>
+<li><code>I</code>: infectious;</li>
+<li><code>R</code>: recovered.</li>
+</ul>
+<p>The model contains two reactions:</p>
+<ol type="1">
+<li>Infection: <code>S + I -&gt; 2 I</code></li>
+<li>Recovery: <code>I -&gt; R</code></li>
+</ol>
+<p>The state vector is:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">c</span>(S, I, R)</span></code></pre></div>
+</div>
+<h3 id="define-the-model-parameters">Define the model parameters</h3>
+<p>Set the total population, infection rate, and recovery rate:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fl">0.5</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>gamma <span class="ot">&lt;-</span> <span class="fl">0.1</span></span></code></pre></div>
+</div>
+<p>Here:</p>
+<pre class="text"><code>N      = total population
+beta   = infection rate
+gamma  = recovery rate</code></pre>
+<h3 id="define-the-rate-function-1">Define the rate function</h3>
+<p>Create a Python callable containing the infection and recovery rates:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>rates_sir <span class="ot">&lt;-</span> reticulate<span class="sc">::</span><span class="fu">py_eval</span>(<span class="fu">sprintf</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;lambda x, t: [%f * x[0] * x[1] / %f, %f * x[1]]&quot;</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  beta,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  N,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  gamma</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>))</span></code></pre></div>
+</div>
+<p>The rates correspond to:</p>
+<pre class="text"><code>beta * S * I / N    # infection
+gamma * I           # recovery</code></pre>
+<h3 id="define-the-stoichiometry-1">Define the stoichiometry</h3>
+<p>Define the reactant matrix:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>reactant_sir <span class="ot">&lt;-</span> <span class="fu">matrix</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">ncol =</span> <span class="dv">3</span>,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">byrow =</span> <span class="cn">TRUE</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>reactant_sir</span></code></pre></div>
+</div>
+<p>Define the product matrix:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>product_sir <span class="ot">&lt;-</span> <span class="fu">matrix</span>(</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">0</span>,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">ncol =</span> <span class="dv">3</span>,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">byrow =</span> <span class="cn">TRUE</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>product_sir</span></code></pre></div>
+</div>
+<p>The net state changes are:</p>
+<pre class="text"><code>S + I -&gt; 2 I    [-1, +1,  0]
+I -&gt; R          [ 0, -1, +1]</code></pre>
+<h3 id="run-the-simulation-1">Run the simulation</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>result_sir <span class="ot">&lt;-</span> <span class="fu">jsf_simulate</span>(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x0 =</span> <span class="fu">c</span>(<span class="at">S =</span> N <span class="sc">-</span> <span class="dv">10</span>, <span class="at">I =</span> <span class="dv">10</span>, <span class="at">R =</span> <span class="dv">0</span>),</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">rates =</span> rates_sir,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">reactant =</span> reactant_sir,</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">product =</span> product_sir,</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">do_disc =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_max =</span> <span class="dv">60</span>,</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">dt =</span> <span class="fl">0.1</span>,</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">switching_threshold =</span> <span class="fu">c</span>(N, <span class="dv">10</span>, N),</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_names =</span> <span class="fu">c</span>(<span class="st">&quot;S&quot;</span>, <span class="st">&quot;I&quot;</span>, <span class="st">&quot;R&quot;</span>),</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">return_type =</span> <span class="st">&quot;JSFResult&quot;</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<p>In this example, <code>do_disc = c(0, 1, 0)</code> allows the infectious compartment to be treated discretely when required.</p>
+<p>This is useful because stochastic effects can be particularly important when the number of infectious individuals is small.</p>
+<h3 id="inspect-the-result-1">Inspect the result</h3>
+<p>Print the result:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>result_sir</span></code></pre></div>
+</div>
+<p>Calculate a summary:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(result_sir)</span></code></pre></div>
+</div>
+<p>Plot the simulated trajectories:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(result_sir)</span></code></pre></div>
+</div>
+<h2 id="return-a-data-frame">Return a data frame</h2>
+<p>The default output from <code>jsf_simulate()</code> is a regular R <code>data.frame</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>df_lv <span class="ot">&lt;-</span> <span class="fu">jsf_simulate</span>(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x0 =</span> <span class="fu">c</span>(<span class="at">prey =</span> <span class="dv">50</span>, <span class="at">predator =</span> <span class="dv">10</span>),</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">rates =</span> rates_lv,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">reactant =</span> reactant_lv,</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">product =</span> product_lv,</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">do_disc =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_max =</span> <span class="dv">10</span>,</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">dt =</span> <span class="fl">0.01</span>,</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">switching_threshold =</span> <span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">30</span>),</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">species_names =</span> <span class="fu">c</span>(<span class="st">&quot;prey&quot;</span>, <span class="st">&quot;predator&quot;</span>),</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">return_type =</span> <span class="st">&quot;data.frame&quot;</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_lv)</span></code></pre></div>
+</div>
+<p>A data frame returned by <code>jsf_simulate()</code> contains:</p>
+<ul>
+<li>a <code>time</code> column; and</li>
+<li>one column for each model species.</li>
+</ul>
+<p>A data frame can later be converted into a <code>JSFResult</code> object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>result_from_df <span class="ot">&lt;-</span> <span class="fu">as_jsf_result</span>(</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  df_lv,</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">method =</span> <span class="st">&quot;operator-splitting&quot;</span>,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">config =</span> <span class="fu">list</span>(</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">model =</span> <span class="st">&quot;Lotka-Volterra&quot;</span>,</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">dt =</span> <span class="fl">0.01</span>,</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">switching_threshold =</span> <span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">30</span>)</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>result_from_df</span></code></pre></div>
+</div>
+<h2 id="summary">Summary</h2>
+<p>The main <code>rjsf</code> workflow is:</p>
+<pre class="text"><code>Define the initial state
+  -&gt; define the rate function
+  -&gt; define the reactant and product matrices
+  -&gt; call jsf_simulate()
+  -&gt; return a data.frame or JSFResult
+  -&gt; inspect the output with print(), summary(), and plot()</code></pre>
+<p>Use a <code>data.frame</code> when you primarily need the simulation values for further analysis.</p>
+<p>Use a <code>JSFResult</code> when you want a structured object containing both the simulation trajectories and their associated metadata.</p>
+
+
+
+
+</body></html>
